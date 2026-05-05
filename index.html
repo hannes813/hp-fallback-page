@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>HP Digitallab – Systemstatus</title>
+  <style>
+    :root {
+      --bg-1: #070b1a;
+      --bg-2: #0d2436;
+      --card-border: rgba(255, 255, 255, 0.16);
+      --text: #f4fbff;
+      --muted: #b9c9d6;
+      --blue: #1d9fea;
+      --green: #27d69b;
+      --danger: #ff6b6b;
+      --warn: #ffd166;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 18%, rgba(29, 159, 234, 0.32), transparent 34%),
+        radial-gradient(circle at 82% 18%, rgba(39, 214, 155, 0.24), transparent 30%),
+        linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 58%, #0b1b2c 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.55), transparent 78%);
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 40px));
+      min-height: 100vh;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 42px 0;
+      position: relative;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 44px;
+      align-items: center;
+      padding: clamp(28px, 5vw, 58px);
+      border: 1px solid var(--card-border);
+      border-radius: 34px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.13), rgba(255,255,255,0.055));
+      box-shadow: 0 34px 90px rgba(0, 0, 0, 0.34);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 34px;
+    }
+
+    .brand img {
+      width: 74px;
+      height: 74px;
+      object-fit: contain;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.08);
+      padding: 8px;
+      box-shadow: 0 14px 34px rgba(0,0,0,0.22);
+    }
+
+    .brand-text strong {
+      display: block;
+      font-size: 19px;
+      letter-spacing: 0.01em;
+    }
+
+    .brand-text span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 18px;
+      color: var(--warn);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--warn);
+      box-shadow: 0 0 22px rgba(255,209,102,0.75);
+    }
+
+    .eyebrow.online { color: var(--green); }
+    .eyebrow.online::before { background: var(--green); box-shadow: 0 0 22px rgba(39,214,155,0.75); }
+    .eyebrow.offline { color: var(--danger); }
+    .eyebrow.offline::before { background: var(--danger); box-shadow: 0 0 22px rgba(255,107,107,0.75); }
+
+    h1 {
+      margin: 0;
+      max-width: 680px;
+      font-size: clamp(38px, 6vw, 74px);
+      line-height: 0.96;
+      letter-spacing: -0.06em;
+    }
+
+    .gradient-text {
+      display: inline-block;
+      color: transparent;
+      background: linear-gradient(120deg, #ffffff 0%, #8fdcff 38%, #65f0bd 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .lead {
+      max-width: 620px;
+      margin: 28px 0 0;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 20px);
+      line-height: 1.7;
+    }
+
+    .info-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 32px;
+    }
+
+    .pill {
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      padding: 10px 14px;
+      color: #dcebf4;
+      background: rgba(255,255,255,0.07);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .pill:hover {
+      background: linear-gradient(120deg, #ffffff 0%, #8fdcff 38%, #65f0bd 100%);
+      color: #0b1b2c;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(29,159,234,0.25);
+    }
+
+    .pill.disabled {
+      opacity: .55;
+      pointer-events: none;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--warn);
+      box-shadow: 0 0 14px rgba(255,209,102,.75);
+      flex: 0 0 auto;
+    }
+
+    .status-dot.ok { background: var(--green); box-shadow: 0 0 16px rgba(101,240,189,.85); }
+    .status-dot.fail { background: var(--danger); box-shadow: 0 0 16px rgba(255,107,107,.85); }
+
+    .status-details {
+      margin-top: 18px;
+      display: grid;
+      gap: 8px;
+      max-width: 620px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.055);
+    }
+
+    .status-row strong { color: #f4fbff; font-weight: 800; }
+    .status-row span { text-align: right; }
+
+    .visual {
+      position: relative;
+      min-height: 410px;
+      display: grid;
+      place-items: center;
+    }
+
+    .visual-card {
+      width: min(100%, 560px);
+      border-radius: 30px;
+      padding: 24px;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 34px 74px rgba(0, 0, 0, 0.26);
+      transform: rotate(1.3deg);
+    }
+
+    .visual-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 22px;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(1px);
+      opacity: 0.82;
+    }
+
+    .orb.one {
+      width: 120px;
+      height: 120px;
+      left: 4%;
+      top: 8%;
+      background: radial-gradient(circle, rgba(29,159,234,0.5), transparent 70%);
+    }
+
+    .orb.two {
+      width: 160px;
+      height: 160px;
+      right: 0;
+      bottom: 2%;
+      background: radial-gradient(circle, rgba(39,214,155,0.36), transparent 70%);
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 22px;
+      padding: 0 8px;
+      color: rgba(222,238,247,0.66);
+      font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .page { width: min(100% - 24px, 720px); padding: 24px 0; }
+      .shell { grid-template-columns: 1fr; gap: 20px; border-radius: 26px; }
+      .brand { margin-bottom: 26px; }
+      .visual { min-height: auto; }
+      footer { flex-direction: column; text-align: center; }
+    }
+
+    @media (max-width: 540px) {
+      .shell { padding: 24px; }
+      .brand img { width: 58px; height: 58px; border-radius: 15px; }
+      .brand-text strong { font-size: 16px; }
+      .brand-text span { font-size: 11px; }
+      .lead { font-size: 16px; }
+      .visual-card { padding: 14px; border-radius: 22px; }
+      .visual-card img { border-radius: 16px; }
+      .info-line { margin-top: 24px; }
+      .status-row { align-items: flex-start; flex-direction: column; }
+      .status-row span { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="shell" aria-label="HP Digitallab Systemstatus">
+      <div class="content">
+        <div class="brand">
+          <img src="logo.png" alt="HP Digitallab Logo">
+          <div class="brand-text">
+            <strong>HP Digitallab</strong>
+            <span>Data · Consulting · AI · SAP HCM</span>
+          </div>
+        </div>
+
+        <p class="eyebrow" id="server-status">Status wird geprüft …</p>
+        <h1>
+          Externe <span class="gradient-text">Wartungsarbeiten.</span>
+        </h1>
+        <p class="lead" id="lead-text">
+          Aktuell erreichst du diese Seite nicht. Wir führen gerade Wartungs- Optimerungsarbeiten an der Infrarstruktur durch.
+        </p>
+
+        <div class="info-line" aria-label="Systemlinks">
+          <a href="https://Platzhalter.de" class="pill" id="btn-server">
+            <span class="status-dot" id="dot-server"></span>Server
+          </a>
+          <a href="https://hp-consulting-hh.de" class="pill" id="btn-infra">
+            <span class="status-dot" id="dot-infra"></span>HP Digitallab Infrastruktur
+          </a>
+          <a href="https://www.hp-digitallab.de/" class="pill" id="btn-web">
+            <span class="status-dot" id="dot-web"></span>Landingpage
+          </a>
+        </div>
+
+        <div class="status-details" aria-label="Live Systemdetails">
+          <div class="status-row"><strong>Server / DynDNS</strong><span id="server-text">wird geprüft …</span></div>
+          <div class="status-row"><strong>Landingpage</strong><span id="web-text">wird geprüft …</span></div>
+          <div class="status-row"><strong>Letzte Prüfung</strong><span id="checked-text">–</span></div>
+        </div>
+      </div>
+
+      <div class="visual" aria-hidden="true">
+        <span class="orb one"></span>
+        <span class="orb two"></span>
+        <div class="visual-card">
+          <img src="hero.jpg" alt="">
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>© HP Digitallab</span>
+      <span>Externe Status- und Fallbackseite</span>
+    </footer>
+  </main>
+
+  <script>
+    const CHECKS = {
+      server: "https://srv.hp-consulting-hh.de",
+      infra: "https://hp-consulting-hh.de",
+      web: "https://www.hp-digitallab.de/"
+    };
+
+    function setDot(id, ok) {
+      const dot = document.getElementById(id);
+      if (!dot) return;
+      dot.classList.remove("ok", "fail");
+      dot.classList.add(ok ? "ok" : "fail");
+    }
+
+    function setButton(id, ok) {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.classList.toggle("disabled", !ok);
+    }
+
+    async function checkUrl(url) {
+      try {
+        /*
+          no-cors ist bewusst gewählt:
+          Externe Seiten liefern meist keine CORS-Header.
+          Wenn der Request technisch durchgeht, werten wir das als erreichbar.
+        */
+        await fetch(url, { mode: "no-cors", cache: "no-store" });
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    async function loadStatus() {
+      const statusEl = document.getElementById("server-status");
+      const leadEl = document.getElementById("lead-text");
+      const serverText = document.getElementById("server-text");
+      const webText = document.getElementById("web-text");
+      const checkedText = document.getElementById("checked-text");
+
+      const [serverOk, infraOk, webOk] = await Promise.all([
+        checkUrl(CHECKS.server),
+        checkUrl(CHECKS.infra),
+        checkUrl(CHECKS.web)
+      ]);
+
+      setDot("dot-server", serverOk);
+      setDot("dot-infra", infraOk);
+      setDot("dot-web", webOk);
+
+      setButton("btn-server", serverOk);
+      setButton("btn-infra", infraOk);
+      setButton("btn-web", webOk);
+
+      serverText.textContent = serverOk
+        ? "erreichbar – Systemlinks sind aktiv"
+        : "nicht erreichbar – Server vermutlich offline oder Port/Firewall blockiert";
+
+      webText.textContent = webOk
+        ? "erreichbar"
+        : "nicht erreichbar";
+
+      checkedText.textContent = new Date().toLocaleString("de-DE");
+
+      statusEl.classList.remove("online", "offline");
+
+      if (serverOk) {
+        statusEl.textContent = "Server erreichbar";
+        statusEl.classList.add("online");
+        leadEl.textContent = "Die externe Fallback-Seite ist erreichbar und deine Infrastruktur antwortet aktuell.";
+      } else {
+        statusEl.textContent = "Server aktuell nicht erreichbar";
+        statusEl.classList.add("offline");
+        leadEl.textContent = "Diese Seite bleibt online. Deine lokale Infrastruktur scheint aktuell nicht erreichbar zu sein.";
+      }
+    }
+
+    loadStatus();
+    setInterval(loadStatus, 60000);
+  </script>
+</body>
+</html>
