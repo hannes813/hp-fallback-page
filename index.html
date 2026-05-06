@@ -91,6 +91,14 @@
       letter-spacing: 0.01em;
     }
 
+	.brand-gradient {
+      display: block;
+      color: transparent;
+      background: linear-gradient(120deg, #65f0bd 0%, #8fdcff 62%, #ffffff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
     .brand-text span {
       display: block;
       margin-top: 3px;
@@ -99,7 +107,7 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
-
+	 
     .eyebrow {
       display: inline-flex;
       align-items: center;
@@ -304,17 +312,17 @@
         <div class="brand">
           <img src="logo.png" alt="HP Digitallab Logo">
           <div class="brand-text">
-            <strong>HP Digitallab</strong>
+            <strong class="brand-gradient">HP Digitallab</strong>
             <span>Data · Consulting · AI · SAP HCM</span>
           </div>
         </div>
 
         <p class="eyebrow" id="server-status">Status wird geprüft …</p>
         <h1>
-          Externe <span class="gradient-text">Wartungsarbeiten.</span>
+          Status: <span class="gradient-text">Wartungsarbeiten.</span>
         </h1>
         <p class="lead" id="lead-text">
-          Aktuell erreichst du diese Seite nicht. Wir führen gerade Wartungs- Optimerungsarbeiten an der Infrarstruktur durch.
+          Aktuell erreichst du diese Seite nicht. Wir führen gerade Wartungs- und Optimerungsarbeiten an der Infrarstruktur durch.
         </p>
 
         <div class="info-line" aria-label="Systemlinks">
@@ -421,11 +429,11 @@
       if (serverOk) {
         statusEl.textContent = "Server erreichbar";
         statusEl.classList.add("online");
-        leadEl.textContent = "Die externe Fallback-Seite ist erreichbar und deine Infrastruktur antwortet aktuell.";
+        leadEl.textContent = "Die Homepage ist derzeit nicht erreichbar, wir führen gerade Wartungs- und Optimierungsarbeiten durch.";
       } else {
         statusEl.textContent = "Server aktuell nicht erreichbar";
         statusEl.classList.add("offline");
-        leadEl.textContent = "Diese Seite bleibt online. Deine lokale Infrastruktur scheint aktuell nicht erreichbar zu sein.";
+        leadEl.textContent = "Die Webanwendungen sind derzeit nicht verfügbar. Die lokale Infrastruktur wird gerade gewartet. Bitte schaue zu einem späteren Zeitpunkt wieder vorbei.";
       }
     }
 
